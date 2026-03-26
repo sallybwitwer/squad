@@ -16,10 +16,17 @@ DEFAULT_ALLOW_ORIGINS = [
     "http://localhost:5173",
     "https://squad-frontend.onrender.com",
 ]
+
+
+def normalize_origin(origin: str) -> str:
+    # Browsers send Origin without a trailing slash; normalize configured values.
+    return origin.strip().rstrip("/")
+
+
 cors_allow_origins = [
-    origin.strip()
+    normalize_origin(origin)
     for origin in os.getenv("CORS_ALLOW_ORIGINS", ",".join(DEFAULT_ALLOW_ORIGINS)).split(",")
-    if origin.strip()
+    if normalize_origin(origin)
 ]
 
 app = FastAPI(title="Squad API")
