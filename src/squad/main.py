@@ -35,13 +35,30 @@ def health() -> dict[str, str]:
 def get_recruiters() -> List[dict[str, Any]]:
     with Session(engine) as session:
         recruiters = session.exec(select(User).where(User.user_type == UserType.RECRUITER)).all()
-        return [
+        rows = [
             {
                 "id": recruiter.id,
                 "name": recruiter.name,
+                "location_preference": recruiter.location_preference,
+                "other_preferences": recruiter.other_preferences,
+                "role_preferences": recruiter.role_preferences,
+                "preference_data_count": (
+                    len(recruiter.location_preference or [])
+                    + len(recruiter.other_preferences or [])
+                    + len(recruiter.role_preferences or [])
+                ),
             }
             for recruiter in recruiters
         ]
+        rows.sort(
+            key=lambda r: (
+                r["preference_data_count"],
+                (r["name"] or "").lower(),
+                r["id"],
+            ),
+            reverse=True,
+        )
+        return rows
 
 @app.get("/roles/{role_id}")
 def get_role(role_id: str) -> dict[str, Any]:
@@ -71,7 +88,7 @@ def get_role_matches(user_id: str) -> dict[str, dict[str, Any]]:
             raise HTTPException(status_code=404, detail="User not found")
 
         # get top ten roles
-        roles = session.exec(select(Role).where(Role.is_accepting_new_submissions == True).order_by(Role.created_at.desc()).limit(10)).all() 
+        roles = session.exec(select(Role).where(Role.is_accepting_new_submissions == True).order_by(Role.created_at.desc())).all() 
         
         user_preference_scores = get_user_preference_match_score(user, roles) 
         print(user_preference_scores)

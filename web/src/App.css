@@ -104,6 +104,30 @@
   word-break: break-all;
 }
 
+.recruiter-search,
+.recruiter-dropdown {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+  box-sizing: border-box;
+}
+
+.recruiter-search {
+  margin-bottom: 0.7rem;
+  padding: 0.5rem 0.65rem;
+}
+
+.recruiter-dropdown-label {
+  margin-top: 0.2rem;
+}
+
+.recruiter-dropdown {
+  padding: 0.55rem 0.65rem;
+}
+
 .muted {
   color: var(--text);
   margin: 0;
