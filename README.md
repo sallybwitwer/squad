@@ -76,7 +76,7 @@ Recruiters like to stay within their domain of expertise, which is highly inform
 **Nice-to-have:**
 - Weight previously submitted roles higher than saved roles
 
-
+---
 
 # Run everything (local development)
 
