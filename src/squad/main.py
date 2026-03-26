@@ -20,7 +20,7 @@ DEFAULT_ALLOW_ORIGINS = [
 
 def normalize_origin(origin: str) -> str:
     # Browsers send Origin without a trailing slash; normalize configured values.
-    return origin.strip().rstrip("/")
+    return origin.strip().strip("'").strip('"').rstrip("/")
 
 
 cors_allow_origins = [
@@ -28,11 +28,15 @@ cors_allow_origins = [
     for origin in os.getenv("CORS_ALLOW_ORIGINS", ",".join(DEFAULT_ALLOW_ORIGINS)).split(",")
     if normalize_origin(origin)
 ]
+print(f"CORS allow origins: {cors_allow_origins}")
+cors_allow_origin_regex = os.getenv("CORS_ALLOW_ORIGIN_REGEX", r"^https://.*\.onrender\.com$")
+print(f"CORS allow origin regex: {cors_allow_origin_regex}")
 
 app = FastAPI(title="Squad API")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_allow_origins,
+    allow_origin_regex=cors_allow_origin_regex,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
