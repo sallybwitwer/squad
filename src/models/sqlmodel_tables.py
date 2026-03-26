@@ -123,6 +123,72 @@ class User(SQLModel, table=True):
     )
 
 
+class Company(SQLModel, table=True):
+    __tablename__ = "Company"
+
+    id: str = Field(
+        sa_column=Column(
+            Text,
+            primary_key=True,
+            server_default=sa_text("gen_random_uuid()::text"),
+        )
+    )
+    whalesync_postgres_id: Optional[uuid.UUID] = Field(
+        default=None,
+        sa_column=Column(UUID(as_uuid=True), unique=True, nullable=True),
+    )
+    name: Optional[str] = Field(default=None, sa_column=Column("name", Text))
+    company_overview: Optional[str] = Field(
+        default=None, sa_column=Column("companyOverview", Text)
+    )
+    company_url: Optional[str] = Field(
+        default=None, sa_column=Column("companyUrl", Text)
+    )
+    about: Optional[str] = Field(default=None, sa_column=Column(Text))
+    client_owner: Optional[str] = Field(
+        default=None, sa_column=Column("clientOwner", Text)
+    )
+    communication_channel: Optional[str] = Field(
+        default=None, sa_column=Column("communicationChannel", Text)
+    )
+    tracking_channel: Optional[str] = Field(
+        default=None, sa_column=Column("trackingChannel", Text)
+    )
+    created: Optional[datetime] = Field(
+        default=None, sa_column=Column("created", _TS3)
+    )
+    last_synced_at: Optional[datetime] = Field(
+        default=None,
+        sa_column=Column(
+            "lastSyncedAt", _TS3, server_default=sa_text("CURRENT_TIMESTAMP")
+        ),
+    )
+    created_at: Optional[datetime] = Field(
+        default=None,
+        sa_column=Column("createdAt", _TS3, server_default=sa_text("CURRENT_TIMESTAMP")),
+    )
+    updated_at: Optional[datetime] = Field(
+        default=None, sa_column=Column("updatedAt", _TS3)
+    )
+    segment: Optional[str] = Field(default=None, sa_column=Column(Text))
+    client_priority: Optional[str] = Field(
+        default=None, sa_column=Column("clientPriority", Text)
+    )
+    client_confidence: Optional[str] = Field(
+        default=None, sa_column=Column("clientConfidence", Text)
+    )
+    airtable_id: Optional[str] = Field(
+        default=None, sa_column=Column(Text, unique=True)
+    )
+    deleted_at: Optional[datetime] = Field(
+        default=None, sa_column=Column("deletedAt", _TS3)
+    )
+
+    roles: list["Role"] = Relationship(
+        sa_relationship=relationship("Role", back_populates="company")
+    )
+
+
 class Role(SQLModel, table=True):
     __tablename__ = "Role"
 
@@ -228,6 +294,9 @@ class Role(SQLModel, table=True):
     countries: Optional[str] = Field(default=None, sa_column=Column(Text))
     role_type: Optional[str] = Field(default=None, sa_column=Column("roleType", Text))
 
+    company: Optional["Company"] = Relationship(
+        sa_relationship=relationship("Company", back_populates="roles")
+    )
     saved_roles: list["SavedRole"] = Relationship(
         sa_relationship=relationship("SavedRole", back_populates="role")
     )
