@@ -76,6 +76,16 @@ Recruiters like to stay within their domain of expertise, which is highly inform
 **Nice-to-have:**
 - Weight previously submitted roles higher than saved roles
 
+- Final Similarity Score = previously submitted candidate role similarity + saved role similarity (normalized)
+  
+### Other factors worth weighing in:
+- Compensation
+- Headcount 
+- Job title count
+- Company roles count
+- Rejection Rate
+- Recruiter’s LinkedIn Network
+
 ---
 
 # Run everything (local development)
