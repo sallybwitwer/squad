@@ -1,5 +1,6 @@
 import { Link, useOutletContext } from 'react-router-dom'
 import type { SquadOutletContext } from './App.tsx'
+import FinalScoreBar from './FinalScoreBar.tsx'
 
 export default function MatchesPanel() {
   const { selectedId, roleMatches, loadingMatches, matchesError } =
@@ -43,6 +44,7 @@ export default function MatchesPanel() {
                     <span className="role-match-label">Company</span>
                     {row.company ?? '—'}
                   </span>
+                  <FinalScoreBar score={row.final_score} />
                 </Link>
               </li>
             ))}

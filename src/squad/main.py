@@ -71,9 +71,10 @@ def get_role_matches(user_id: str) -> dict[str, dict[str, Any]]:
             raise HTTPException(status_code=404, detail="User not found")
 
         # get top ten roles
-        roles = session.exec(select(Role).where(Role.is_accepting_new_submissions == True).order_by(Role.created_at.desc()).limit(10)).all()
+        roles = session.exec(select(Role).where(Role.is_accepting_new_submissions == True).order_by(Role.created_at.desc()).limit(10)).all() 
         
         user_preference_scores = get_user_preference_match_score(user, roles) 
+        print(user_preference_scores)
         # get all roles with final_score greater than 0.5
         matching_user_preferences = { # role id to user preference score
             role.id: user_preference_scores.get(role.id, {}).get("final_score", 0)
@@ -90,7 +91,7 @@ def get_role_matches(user_id: str) -> dict[str, dict[str, Any]]:
             co = session.exec(select(Company).where(Company.id == r.company_id)).first()
             return co.name if co else None
 
-        return {
+        result = {
             role.id: {
                 "required_location": role.required_location,
                 "role": role.role,
@@ -102,5 +103,11 @@ def get_role_matches(user_id: str) -> dict[str, dict[str, Any]]:
                 **user_preference_scores.get(role.id, {}),
             }
             for role in roles
-            if user_preference_scores.get(role.id, {}).get("final_score", 0) > 0.5
+            if user_preference_scores.get(role.id, {}).get("final_score", 0) >= 0.5
+        }
+        # result needs to be sorted by final_score descending
+        result = sorted(result.items(), key=lambda x: x[1]["final_score"], reverse=True)
+        return {
+            role_id: data
+            for role_id, data in result
         }

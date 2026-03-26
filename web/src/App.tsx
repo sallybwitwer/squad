@@ -8,10 +8,25 @@ export type Recruiter = {
   name: string | null
 }
 
+/** Row from GET /role-matches/{user_id}; includes scoring breakdown from preference matching. */
 export type RoleMatchRow = {
   role: string | null
   required_location: string | null
   company: string | null
+  requirements_structured?: string | null
+  final_score?: number
+  /** LLM batch path */
+  location_preference?: number
+  /** Empty-user early-return path in role_matching */
+  location_preference_score?: number
+  location_preference_matched?: string[]
+  other_preferences?: number
+  other_preferences_matched?: string[]
+  role_classification?: string
+  role_preferences?: number
+  user_location_preference?: string[]
+  user_other_preferences?: string[]
+  user_role_preferences?: string[]
 }
 
 export type SquadOutletContext = {
