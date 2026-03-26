@@ -78,7 +78,7 @@ Recruiters like to stay within their domain of expertise, which is highly inform
 
 
 
-## Run everything (local development)
+# Run everything (local development)
 
 You need two processes: the FastAPI backend on port **8000**, and the Vite dev server for the React UI (default **5173**). Configure `DATABASE_URL` in `.env` (or your environment) so the API can connect to the database.
 
