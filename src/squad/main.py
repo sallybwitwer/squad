@@ -11,14 +11,21 @@ from fastapi import HTTPException
 import os
 
 DATABASE_URL = os.getenv("DATABASE_URL")
+DEFAULT_ALLOW_ORIGINS = [
+    "http://127.0.0.1:5173",
+    "http://localhost:5173",
+    "https://squad-frontend.onrender.com",
+]
+cors_allow_origins = [
+    origin.strip()
+    for origin in os.getenv("CORS_ALLOW_ORIGINS", ",".join(DEFAULT_ALLOW_ORIGINS)).split(",")
+    if origin.strip()
+]
 
 app = FastAPI(title="Squad API")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://127.0.0.1:5173",
-        "http://localhost:5173",
-    ],
+    allow_origins=cors_allow_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
