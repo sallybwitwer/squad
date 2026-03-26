@@ -1,5 +1,85 @@
 # Squad
 
+# Notes
+
+Recruiters like to stay within their domain of expertise, which is highly informed by their network (LinkedIn).
+
+---
+
+## Factors
+*(Some recruiters might prioritize some of these more than others — worth keeping a history of recruiter preferences)*
+
+### Job Title
+- Want lots of the same job title so we can send multiple to one candidate.
+- Job title should match recruiter’s area of expertise.
+- If the headcount is high, that’s good — can send multiple roles to the same candidates.
+
+### Headcount & People in Process
+- Prefer high headcount / people-in-process ratio.
+- ~12 people per head is a reasonable cutoff (with exceptions).
+
+### Companies
+- Recruiters browse by company due to overhead of learning mission/goals.
+- Preference for:
+  - Companies they’ve recruited for before, OR
+  - Companies with similar missions to ones they’ve worked with.
+
+### Payout
+- Is the payout competitive?
+- How does it rank against other role postings?
+
+### Location
+- Is the location similar to ones the recruiter has placed candidates in?
+- Does it match the recruiter’s network?
+- If not, is it remote?
+
+### Rejection Rate
+- High rejection rate = harder to find a match.
+
+### High Priority Roles
+- Roles needing urgent fill are prioritized.
+- Recruiters will spend more time on these.
+
+### Network
+- Recruiters reach out to their network first.
+- Key question: which roles match people in their LinkedIn network?
+
+---
+
+## Proposed Logic Flow
+
+### 1. Get Recruiters [x]
+
+### 2. For a Requested Recruiter [x]
+
+#### Preferences-Based Filtering [x]
+- Score roles by:
+  - Role preferences [x]
+  - Location preferences [x]
+- Filter roles:
+  - Must be accepting new submissions [x]
+  - Remove roles with score < 0.5 [x]
+
+---
+
+### 3. Comparison Roles
+
+- Look at:
+  - Previously submitted candidates
+  - Saved roles
+
+#### For Each Comparison Role
+- Create a similarity score based on:
+  - Similarity to previously submitted candidate roles
+  - Similarity to saved roles
+
+**Nice-to-have:**
+- Weight previously submitted roles higher than saved roles
+
+**Final Similarity Score:**
+
+
+
 ## Run everything (local development)
 
 You need two processes: the FastAPI backend on port **8000**, and the Vite dev server for the React UI (default **5173**). Configure `DATABASE_URL` in `.env` (or your environment) so the API can connect to the database.

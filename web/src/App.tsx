@@ -6,6 +6,10 @@ import './App.css'
 export type Recruiter = {
   id: string
   name: string | null
+  preference_data_count?: number
+  location_preference?: string[]
+  other_preferences?: string[]
+  role_preferences?: string[]
 }
 
 /** Row from GET /role-matches/{user_id}; includes scoring breakdown from preference matching. */
@@ -38,6 +42,7 @@ export type SquadOutletContext = {
 
 export default function AppLayout() {
   const [recruiters, setRecruiters] = useState<Recruiter[]>([])
+  const [recruiterQuery, setRecruiterQuery] = useState('')
   const [loadingList, setLoadingList] = useState(true)
   const [listError, setListError] = useState<string | null>(null)
 
@@ -108,6 +113,13 @@ export default function AppLayout() {
     matchesError,
   }
 
+  const normalizedQuery = recruiterQuery.trim().toLowerCase()
+  const filteredRecruiters = recruiters.filter((r) => {
+    if (!normalizedQuery) return true
+    const name = (r.name ?? '').toLowerCase()
+    return name.includes(normalizedQuery) || r.id.toLowerCase().includes(normalizedQuery)
+  })
+
   return (
     <div className="layout">
       <header className="header">
@@ -123,22 +135,43 @@ export default function AppLayout() {
           {!loadingList && !listError && recruiters.length === 0 && (
             <p className="muted">No recruiters found.</p>
           )}
-          <ul className="recruiter-list">
-            {recruiters.map((r) => (
-              <li key={r.id}>
-                <button
-                  type="button"
-                  className={
-                    selectedId === r.id ? 'recruiter-btn selected' : 'recruiter-btn'
-                  }
-                  onClick={() => selectRecruiter(r.id)}
-                >
-                  <span className="recruiter-name">{r.name ?? '(no name)'}</span>
-                  <span className="recruiter-id">{r.id}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
+          {!loadingList && !listError && recruiters.length > 0 && (
+            <>
+              <label htmlFor="recruiter-search" className="role-match-label">
+                Search recruiter
+              </label>
+              <input
+                id="recruiter-search"
+                type="text"
+                className="recruiter-search"
+                value={recruiterQuery}
+                onChange={(e) => setRecruiterQuery(e.target.value)}
+                placeholder="Search by name or id"
+              />
+              <label htmlFor="recruiter-dropdown" className="role-match-label recruiter-dropdown-label">
+                Recruiters (highest preference data first)
+              </label>
+              <select
+                id="recruiter-dropdown"
+                className="recruiter-dropdown"
+                value={selectedId ?? ''}
+                onChange={(e) => {
+                  const id = e.target.value
+                  if (id) selectRecruiter(id)
+                }}
+              >
+                <option value="">Select a recruiter...</option>
+                {filteredRecruiters.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.name ?? '(no name)'}
+                  </option>
+                ))}
+              </select>
+              {filteredRecruiters.length === 0 && (
+                <p className="muted">No recruiters match your search.</p>
+              )}
+            </>
+          )}
         </section>
 
         <section className="panel detail">
