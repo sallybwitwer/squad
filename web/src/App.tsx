@@ -1,26 +1,50 @@
 import { useCallback, useEffect, useState } from 'react'
+import { Outlet } from 'react-router-dom'
+import { apiBase } from './api'
 import './App.css'
 
-/** In dev, Vite proxies /api → FastAPI (see vite.config.ts). Override with VITE_API_URL. */
-function apiBase(): string {
-  const fromEnv = import.meta.env.VITE_API_URL
-  if (fromEnv) return fromEnv.replace(/\/$/, '')
-  if (import.meta.env.DEV) return '/api'
-  return 'http://127.0.0.1:8000'
-}
-
-type Recruiter = {
+export type Recruiter = {
   id: string
   name: string | null
 }
 
-export default function App() {
+/** Row from GET /role-matches/{user_id}; includes scoring breakdown from preference matching. */
+export type RoleMatchRow = {
+  role: string | null
+  required_location: string | null
+  company: string | null
+  requirements_structured?: string | null
+  final_score?: number
+  /** LLM batch path */
+  location_preference?: number
+  /** Empty-user early-return path in role_matching */
+  location_preference_score?: number
+  location_preference_matched?: string[]
+  other_preferences?: number
+  other_preferences_matched?: string[]
+  role_classification?: string
+  role_preferences?: number
+  user_location_preference?: string[]
+  user_other_preferences?: string[]
+  user_role_preferences?: string[]
+}
+
+export type SquadOutletContext = {
+  selectedId: string | null
+  roleMatches: Record<string, RoleMatchRow> | null
+  loadingMatches: boolean
+  matchesError: string | null
+}
+
+export default function AppLayout() {
   const [recruiters, setRecruiters] = useState<Recruiter[]>([])
   const [loadingList, setLoadingList] = useState(true)
   const [listError, setListError] = useState<string | null>(null)
 
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [roleMatches, setRoleMatches] = useState<unknown>(null)
+  const [roleMatches, setRoleMatches] = useState<Record<string, RoleMatchRow> | null>(
+    null,
+  )
   const [loadingMatches, setLoadingMatches] = useState(false)
   const [matchesError, setMatchesError] = useState<string | null>(null)
 
@@ -63,7 +87,7 @@ export default function App() {
       .then((res) => {
         if (res.status === 404) throw new Error('User not found')
         if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
-        return res.json()
+        return res.json() as Promise<Record<string, RoleMatchRow>>
       })
       .then((data) => setRoleMatches(data))
       .catch((e: unknown) => {
@@ -76,6 +100,13 @@ export default function App() {
       })
       .finally(() => setLoadingMatches(false))
   }, [])
+
+  const outletContext: SquadOutletContext = {
+    selectedId,
+    roleMatches,
+    loadingMatches,
+    matchesError,
+  }
 
   return (
     <div className="layout">
@@ -111,19 +142,7 @@ export default function App() {
         </section>
 
         <section className="panel detail">
-          <h2>Role matches</h2>
-          {!selectedId && (
-            <p className="muted">Select a recruiter to load role matches.</p>
-          )}
-          {selectedId && loadingMatches && <p className="muted">Loading…</p>}
-          {selectedId && matchesError && (
-            <p className="error">{matchesError}</p>
-          )}
-          {selectedId && !loadingMatches && !matchesError && roleMatches !== null && (
-            <pre className="json-out">
-              {JSON.stringify(roleMatches, null, 2)}
-            </pre>
-          )}
+          <Outlet context={outletContext} />
         </section>
       </div>
     </div>
